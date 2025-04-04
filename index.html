@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>출석 체크</title>
+    <script>
+      const scriptUrl = "여기에_웹앱_URL_붙여넣기";
+
+      function submitAttendance() {
+        let name = document.getElementById("name").value.trim();
+        let phone = document.getElementById("phone").value.trim().replace(/-/g, "");
+
+        if (!name || !phone) {
+          alert("이름과 전화번호를 모두 입력해주세요.");
+          return;
+        }
+
+        // 저장 (최초 1회)
+        localStorage.setItem("myName", name);
+        localStorage.setItem("myPhone", phone);
+
+        // 출석 요청
+        window.location.href = `${scriptUrl}?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`;
+      }
+
+      window.onload = function () {
+        const storedName = localStorage.getItem("myName");
+        const storedPhone = localStorage.getItem("myPhone");
+
+        if (storedName && storedPhone) {
+          // 자동 출석
+          window.location.href = `${scriptUrl}?name=${encodeURIComponent(storedName)}&phone=${encodeURIComponent(storedPhone)}`;
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <h2>출석 체크</h2>
+    <p>※ 이름과 전화번호는 최초 1회만 입력합니다.</p>
+    <p>※ 전화번호는 하이픈(-) 없이 숫자만 입력해주세요.</p>
+    <label>이름: </label><br />
+    <input type="text" id="name" placeholder="홍길동" /><br /><br />
+    <label>전화번호: </label><br />
+    <input type="text" id="phone" placeholder="01012345678" /><br /><br />
+    <button onclick="submitAttendance()">출석하기</button>
+  </body>
+</html>
