@@ -1,48 +1,68 @@
-
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>출석 체크</title>
-    <script>
-      const scriptUrl = "https://script.google.com/macros/s/AKfycbxNbltfilena61VhR5Dr1dMRxa35jMlN6ak6VEDBzlIQIzk6d6d1TidWLmwcv3WUZR2/exec";
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>출석 체크</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 20px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+      text-align: center;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h2>출석 체크</h2>
+  <form id="attendance-form">
+    <input type="text" id="name" placeholder="이름 (띄어쓰기 없이)" required><br>
+    <input type="tel" id="phone" placeholder="전화번호 (예: 01012345678)" required><br>
+    <button type="submit">출석하기</button>
+  </form>
+  <p id="response"></p>
 
-      function submitAttendance() {
-        let name = document.getElementById("name").value.trim();
-        let phone = document.getElementById("phone").value.trim().replace(/-/g, "");
+  <script>
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbxNbltfilena61VhR5Dr1dMRxa35jMlN6ak6VEDBzlIQIzk6d6d1TidWLmwcv3WUZR2/exec";
 
-        if (!name || !phone) {
-          alert("이름과 전화번호를 모두 입력해주세요.");
-          return;
-        }
-
-        // 저장 (최초 1회)
-        localStorage.setItem("myName", name);
-        localStorage.setItem("myPhone", phone);
-
-        // 출석 요청
-        window.location.href = `${scriptUrl}?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`;
+    document.getElementById('attendance-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      if (name.includes(" ")) {
+        document.getElementById('response').textContent = "이름은 띄어쓰기 없이 입력해주세요.";
+        return;
       }
-
-      window.onload = function () {
-        const storedName = localStorage.getItem("myName");
-        const storedPhone = localStorage.getItem("myPhone");
-
-        if (storedName && storedPhone) {
-          // 자동 출석
-          window.location.href = `${scriptUrl}?name=${encodeURIComponent(storedName)}&phone=${encodeURIComponent(storedPhone)}`;
-        }
-      };
-    </script>
-  </head>
-  <body>
-    <h2>출석 체크</h2>
-    <p>※ 이름과 전화번호는 최초 1회만 입력합니다.</p>
-    <p>※ 전화번호는 하이픈(-) 없이 숫자만 입력해주세요.</p>
-    <label>이름: </label><br />
-    <input type="text" id="name" placeholder="홍길동" /><br /><br />
-    <label>전화번호: </label><br />
-    <input type="text" id="phone" placeholder="01012345678" /><br /><br />
-    <button onclick="submitAttendance()">출석하기</button>
-  </body>
+      fetch(`${scriptUrl}?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`)
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById('response').textContent = data;
+        })
+        .catch(error => {
+          document.getElementById('response').textContent = "오류가 발생했습니다. 다시 시도해주세요.";
+        });
+    });
+  </script>
+</body>
 </html>
