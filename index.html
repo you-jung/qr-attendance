@@ -44,24 +44,30 @@
   <p id="response"></p>
 
   <script>
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbxysmxjdrRRXS0GichDDBtqJSrxt6UmYX7tzEKd10vvr6gOOLmTQfXvHIeNSon0aCaN/exec";
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbz17r-n5yAx32CDKIwiPXtu4Cuv-xnx73mjC7R_7xcoea9qysWmhzMUun3siSbICH-W/exec";
 
     document.getElementById('attendance-form').addEventListener('submit', function(e) {
       e.preventDefault();
       const name = document.getElementById('name').value.trim();
       const phone = document.getElementById('phone').value.trim();
+      const responseEl = document.getElementById('response');
+
       if (name.includes(" ")) {
-        document.getElementById('response').textContent = "이름은 띄어쓰기 없이 입력해주세요.";
+        responseEl.textContent = "이름은 띄어쓰기 없이 입력해주세요.";
         return;
       }
+
       fetch(`${scriptUrl}?name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`)
-        .then(response => response.text())
+        .then(response => {
+          if (!response.ok) throw new Error("서버 오류: " + response.status);
+          return response.text();
+        })
         .then(data => {
-          document.getElementById('response').textContent = data;
+          responseEl.textContent = data;
         })
         .catch(error => {
           console.error("오류 발생:", error);
-          document.getElementById('response').textContent = "오류가 발생했습니다. 다시 시도해주세요.";
+          responseEl.textContent = "오류가 발생했습니다. 다시 시도해주세요.";
         });
     });
   </script>
